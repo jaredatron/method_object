@@ -1,3 +1,3 @@
-module MethodObject
+class MethodObject
   VERSION = "0.0.1"
 end
