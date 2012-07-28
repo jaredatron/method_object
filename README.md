@@ -1,6 +1,8 @@
 # MethodObject
 
-TODO: Write a gem description
+MethodObject is a simple class for facilitating the method object pattern.
+
+You can think of a MethodObject as a proc with private methods.
 
 ## Installation
 
@@ -18,7 +20,75 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
+    class Car
+
+      # take the following long method
+      def drive_to location, speed=:slow
+        # find location
+        Lorem ipsum dolor sit amet, consectetur adipisicing
+        elit, sed do eiusmod tempor incididunt ut labore
+
+        # set speed
+        et dolore magna aliqua. Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco laboris nisi ut
+        aliquip ex ea commodo
+
+        # start car
+        consequat. Duis aute irure dolor in reprehenderit in voluptate
+        cillum dolore eu fugiat nulla pariatur. Excepteur
+        proident, sunt in culpa qui officia deserunt mollit anim
+
+        # go
+        id est laborum.
+      end
+
+    end
+
+Rather then complecting your Car object with more the one method that all
+have to do with driving to a location you can use a method object to break
+up your code without cluttering Car
+
+    class Car
+
+      class DriveTo < MethodObject
+        def call location, speed
+          @location, @speed = location, speed
+          find_location
+          set_speed
+          start_car
+          go
+        end
+
+        def find_location
+          Lorem ipsum dolor sit amet, consectetur adipisicing
+          elit, sed do eiusmod tempor incididunt ut labore
+        end
+
+        def set_speed
+          et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo
+        end
+
+        def start_car
+          consequat. Duis aute irure dolor in reprehenderit in voluptate
+          cillum dolore eu fugiat nulla pariatur. Excepteur
+          proident, sunt in culpa qui officia deserunt mollit anim
+        end
+
+        def go
+          id est laborum.
+        end
+
+
+      end
+
+      def drive_to location, speed=:slow
+        DriveTo.call(location, speed)
+      end
+
+    end
 
 ## Contributing
 
