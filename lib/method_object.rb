@@ -9,6 +9,10 @@ class MethodObject
       new.call(*args)
     end
 
+    def to_proc
+      method(:call).to_proc
+    end
+
   end
 
 end
@@ -37,6 +41,11 @@ class MethodObjectTestUnitTestCase < Test::Unit::TestCase
 
   def test_that_expected_options_are_ok
     assert_equal FindTreasureChest.call(:a, :size => 42), [:a, {:size => 42}, :treasure_chest]
+  end
+
+  def test_to_proc
+    assert_equal FindTreasureChest.to_proc.call, [:treasure_chest]
+    assert_equal FindTreasureChest.to_proc.call(:foo), [:foo, :treasure_chest]
   end
 
 end
