@@ -1,12 +1,17 @@
 require File.expand_path('../method_object/version', __FILE__)
 
-class MethodObject
+class MethodObject < SimpleStruct
 
   class << self
 
-    private :new
+    def new *members, &block
+      subclass = super(*members, &block)
+      subclass.send(:private_class_method, :new)
+      subclass
+    end
+
     def call *args
-      new.call(*args)
+      new(*args).call
     end
 
     def to_proc
@@ -22,9 +27,9 @@ eval <<-RUBY if $0 == __FILE__
 require 'test/unit'
 
 # example method objects
-class FindTreasureChest < MethodObject
-  def call *args
-    args + [:treasure_chest]
+FindTreasureChest = MethodObject.new(:color, :size) do
+  def call
+    [@color, @size, :treasure_chest]
   end
 end
 
@@ -35,17 +40,18 @@ class MethodObjectTestUnitTestCase < Test::Unit::TestCase
     assert_raises(NoMethodError){ FindTreasureChest.new }
   end
 
-  def test_unknown_options
-    assert_equal FindTreasureChest.call, [:treasure_chest]
-  end
-
   def test_that_expected_options_are_ok
-    assert_equal FindTreasureChest.call(:a, :size => 42), [:a, {:size => 42}, :treasure_chest]
+    run_proc_tests FindTreasureChest
   end
 
   def test_to_proc
-    assert_equal FindTreasureChest.to_proc.call, [:treasure_chest]
-    assert_equal FindTreasureChest.to_proc.call(:foo), [:foo, :treasure_chest]
+    run_proc_tests FindTreasureChest.to_proc
+  end
+
+  def run_proc_tests proc
+    assert_equal proc.call,           [nil,  nil, :treasure_chest]
+    assert_equal proc.call(:red),     [:red, nil, :treasure_chest]
+    assert_equal proc.call(:red, 42), [:red,  42, :treasure_chest]
   end
 
 end

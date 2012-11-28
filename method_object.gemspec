@@ -14,4 +14,6 @@ Gem::Specification.new do |gem|
   gem.name          = "method_object"
   gem.require_paths = ["lib"]
   gem.version       = MethodObject::VERSION
+
+  gem.add_runtime_dependency "simple_struct"
 end

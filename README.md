@@ -25,22 +25,11 @@ Or install it yourself as:
 
       # take the following long method
       def drive_to location, speed=:slow
-        # find location
-        Lorem ipsum dolor sit amet, consectetur adipisicing
-        elit, sed do eiusmod tempor incididunt ut labore
-
-        # set speed
-        et dolore magna aliqua. Ut enim ad minim veniam,
-        quis nostrud exercitation ullamco laboris nisi ut
-        aliquip ex ea commodo
-
-        # start car
-        consequat. Duis aute irure dolor in reprehenderit in voluptate
-        cillum dolore eu fugiat nulla pariatur. Excepteur
-        proident, sunt in culpa qui officia deserunt mollit anim
-
-        # go
-        id est laborum.
+        car = Car.new
+        car.location = GoogleMaps.find(location)
+        car.start!
+        car.speed = speed
+        return car
       end
 
     end
@@ -52,40 +41,36 @@ up your code without cluttering Car
     class Car
 
       class DriveTo < MethodObject
-        def call location, speed
-          @location, @speed = location, speed
-          find_location
-          set_speed
-          start_car
-          go
+
+        # Note: call takes no arguments. The hash given to Car.call is
+        # turn into instance variables
+        def call
+          find_location!
+          start_car!
+          set_speed!
+          return car
         end
 
-        def find_location
-          Lorem ipsum dolor sit amet, consectetur adipisicing
-          elit, sed do eiusmod tempor incididunt ut labore
+        def car
+          @car ||= Car.new
         end
 
-        def set_speed
-          et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo
+        def find_location!
+          car.location = GoogleMaps.find(@location)
         end
 
-        def start_car
-          consequat. Duis aute irure dolor in reprehenderit in voluptate
-          cillum dolore eu fugiat nulla pariatur. Excepteur
-          proident, sunt in culpa qui officia deserunt mollit anim
+        def start_car!
+          car.start!
         end
 
-        def go
-          id est laborum.
+        def set_speed!
+          car.speed = @speed
         end
-
 
       end
 
       def drive_to location, speed=:slow
-        DriveTo.call(location, speed)
+        DriveTo.call(:location => location, :speed => speed)
       end
 
     end
