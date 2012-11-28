@@ -1,6 +1,8 @@
-require File.expand_path('../method_object/version', __FILE__)
+require 'simple_struct'
 
 class MethodObject < SimpleStruct
+
+  VERSION = "0.0.2"
 
   class << self
 
