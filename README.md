@@ -20,62 +20,25 @@ Or install it yourself as:
 
 ## Usage
 
-
-    class Car
-
-      # take the following long method
-      def drive_to location, speed=:slow
-        car = Car.new
-        car.location = GoogleMaps.find(location)
-        car.start!
-        car.speed = speed
-        return car
-      end
-
+```ruby
+  class OpenChest < MethodObject
+    option :size,  default: 12
+    option :color, required: true
+    def call
+      [@size, color]
     end
+  end
 
-Rather then complecting your Car object with more the one method that all
-have to do with driving to a location you can use a method object to break
-up your code without cluttering Car
-
-    class Car
-
-      class DriveTo < MethodObject
-
-        # Note: call takes no arguments. The hash given to Car.call is
-        # turn into instance variables
-        def call
-          find_location!
-          start_car!
-          set_speed!
-          return car
-        end
-
-        def car
-          @car ||= Car.new
-        end
-
-        def find_location!
-          car.location = GoogleMaps.find(@location)
-        end
-
-        def start_car!
-          car.start!
-        end
-
-        def set_speed!
-          car.speed = @speed
-        end
-
-      end
-
-      def drive_to location, speed=:slow
-        DriveTo.call(:location => location, :speed => speed)
-      end
-
+  class OpenMagicChest < OpenChest
+    option :size, required: true
+    option :key_type, default: ->{ :upside }
+    def call
+      [size, color, @key_type]
     end
+  end
+```
 
-## Contributing
+# Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)

@@ -1,61 +1,64 @@
-require 'simple_struct'
+class MethodObject
 
-class MethodObject < SimpleStruct
-
-  VERSION = "0.0.3"
+  VERSION = 2
 
   class << self
+    private :new
 
-    def new *members, &block
-      subclass = super(*members, &block)
-      subclass.send(:private_class_method, :new)
-      subclass
+    def call options=nil
+      new(options).call
     end
 
-    def call *args
-      new(*args).call
+    def options
+      @options ||= {}
+      (superclass.respond_to?(:options) ? superclass.options : {}).merge @options
     end
 
-    def to_proc
-      method(:call).to_proc
+    def option name, details={}
+      if details.has_key?(:required) && details.has_key?(:default)
+        raise ArgumentError, "giving a default to a required option doesnt make any sense.", caller(2)
+      end
+      @options ||= {}
+      @options[name] = details
+      all_instance_methods = public_instance_methods + private_instance_methods + protected_instance_methods(false)
+      attr_reader(name) unless all_instance_methods.include? :"#{name}"
+      attr_writer(name) unless all_instance_methods.include? :"#{name}="
+      self
     end
-
   end
 
-end
-
-eval <<-RUBY if $0 == __FILE__
-
-require 'test/unit'
-
-# example method objects
-FindTreasureChest = MethodObject.new(:color, :size) do
   def call
-    [@color, @size, :treasure_chest]
+    raise "#{self.class}#call is not defined"
   end
+
+  def initialize options=nil
+    process_options! options
+  end
+
+  private
+
+  def process_options! options
+    options = (options || {})
+    self.class.options.each do |name, details|
+
+      if options.has_key?(name)
+        send "#{name}=", options.delete(name)
+        next
+      end
+
+      if details[:required]
+        raise ArgumentError, "#{name} is a required option for #{self.class}", caller(4)
+      end
+
+      if default = details[:default]
+        default = instance_exec(&default) if default.respond_to? :call
+        send "#{name}=", default
+      end
+
+    end
+
+    return if options.keys.empty?
+    raise ArgumentError, "unknown options #{options.inspect}", caller(4)
+  end
+
 end
-
-#tests
-class MethodObjectTestUnitTestCase < Test::Unit::TestCase
-
-  def test_method_objects_have_private_new_method
-    assert_raises(NoMethodError){ FindTreasureChest.new }
-  end
-
-  def test_that_expected_options_are_ok
-    run_proc_tests FindTreasureChest
-  end
-
-  def test_to_proc
-    run_proc_tests FindTreasureChest.to_proc
-  end
-
-  def run_proc_tests proc
-    assert_equal proc.call,           [nil,  nil, :treasure_chest]
-    assert_equal proc.call(:red),     [:red, nil, :treasure_chest]
-    assert_equal proc.call(:red, 42), [:red,  42, :treasure_chest]
-  end
-
-end
-
-RUBY
