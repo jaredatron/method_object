@@ -2,7 +2,7 @@
 
 MethodObject is a simple class for facilitating the method object pattern.
 
-You can think of a MethodObject as a proc with private methods.
+You can think of a MethodObject as a proc with the power of a class. Define methods, use instance variables, etc.
 
 ## Installation
 
@@ -21,21 +21,17 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-  class OpenChest < MethodObject
-    option :size,  default: 12
-    option :color, required: true
-    def call
-      [@size, color]
+  class OpenDoor < MethodObject
+    def call door
+      open_door!(door)
+    end
+
+    def open_door!(door)
+      door.open
     end
   end
 
-  class OpenMagicChest < OpenChest
-    option :size, required: true
-    option :key_type, default: ->{ :upside }
-    def call
-      [size, color, @key_type]
-    end
-  end
+  OpenDoor.call(my_door)
 ```
 
 # Contributing
