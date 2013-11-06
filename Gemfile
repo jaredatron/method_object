@@ -1,9 +1,3 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
-# Specify your gem's dependencies in method_object.gemspec
 gemspec
-
-group :development do
-  gem 'rake'
-  gem 'pry'
-end

@@ -2,63 +2,70 @@ require 'spec_helper'
 
 describe MethodObject do
 
-  class OpenChest < MethodObject
-    option :size,  default: 12
-    option :color, required: true
-    def call
-      [@size, color]
+  let(:block) { ->{} }
+
+  class SimpleMethodObject < MethodObject
+    def call *args, &block
+      [args, block]
     end
   end
 
-  class OpenMagicChest < OpenChest
-    option :size, required: true
-    option :key_type, default: ->{ :upside }
-    def call
-      [size, color, @key_type]
+  class SimpleMethodObjectWithNoCallMethod < MethodObject
+  end
+
+  shared_examples 'a method object' do
+    describe '.new' do
+      it 'should be private' do
+        expect(subject.private_methods).to include :new
+      end
+    end
+    describe '.to_proc' do
+      it 'should return a proc that calls call' do
+        expect(subject.to_proc).to be_a Proc
+        expect(subject).to receive(:call).with(:a,:b)
+        subject.to_proc.(:a, :b)
+      end
     end
   end
 
-  it 'should work' do
 
-    expect{ OpenChest.call               }.to raise_error ArgumentError, 'color is a required option for OpenChest'
-    expect{ OpenChest.call(size: 14)     }.to raise_error ArgumentError, 'color is a required option for OpenChest'
-    expect{ OpenChest.call(color: 'red') }.to_not raise_error
-
-    size, color = OpenChest.call(color: 'red')
-    expect(size).to eq 12
-    expect(color).to eq 'red'
-
-    size, color = OpenChest.call(color: 'blue', size: 45)
-    expect(size).to eq 45
-    expect(color).to eq 'blue'
-
-    size, color = OpenChest.call(color: nil, size: nil)
-    expect(size).to be_nil
-    expect(color).to be_nil
-
-
-    expect{ OpenMagicChest.call                             }.to raise_error ArgumentError, 'size is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(size: 14)                   }.to raise_error ArgumentError, 'color is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(color: 'red')               }.to raise_error ArgumentError, 'size is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(size: 14, key_type: :a)     }.to raise_error ArgumentError, 'color is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(color: 'red', key_type: :a) }.to raise_error ArgumentError, 'size is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(color: 'red')               }.to raise_error ArgumentError, 'size is a required option for OpenMagicChest'
-    expect{ OpenMagicChest.call(size: 14, color: 'red')     }.to_not raise_error
-
-    size, color, key_type = OpenMagicChest.call(size: 14, color: 'red')
-    expect(size).to eq 14
-    expect(color).to eq 'red'
-    expect(key_type).to eq :upside
-
-    size, color, key_type = OpenMagicChest.call(size: 18, color: 'green', key_type: :b)
-    expect(size).to eq 18
-    expect(color).to eq 'green'
-    expect(key_type).to eq :b
-
-    size, color, key_type = OpenMagicChest.call(size: nil, color: nil, key_type: nil)
-    expect(size).to be_nil
-    expect(color).to be_nil
-    expect(key_type).to be_nil
-
+  describe SimpleMethodObjectWithNoCallMethod do
+    subject{ SimpleMethodObjectWithNoCallMethod }
+    it_behaves_like 'a method object'
+    describe '.call' do
+      it 'should raise a SimpleMethodObjectWithNoCallMethod#call is not defined error' do
+        expect{ subject.call }.to raise_error StandardError, "SimpleMethodObjectWithNoCallMethod#call is not defined"
+      end
+    end
   end
+
+  describe SimpleMethodObject do
+    subject{ SimpleMethodObject }
+    it_behaves_like 'a method object'
+    it "should curry all args and block to #call" do
+      expect( subject.call(1,2,3, &block)         ).to eq [[1,2,3], block]
+      expect( subject.to_proc.call(1,2,3, &block) ).to eq [[1,2,3], block]
+    end
+  end
+
+  describe 'used as a block' do
+    it 'should work' do
+      expect( [1,2,3].map(&SimpleMethodObject) ).to eq [
+        [[1], nil],
+        [[2], nil],
+        [[3], nil],
+      ]
+    end
+  end
+
+  describe 'used to define a method' do
+    it 'should work' do
+      _class = Class.new do
+        define_method :foo, &SimpleMethodObject
+      end
+
+      expect( _class.new.foo('hello', :world, &block) ).to eq [['hello', :world], block]
+    end
+  end
+
 end
