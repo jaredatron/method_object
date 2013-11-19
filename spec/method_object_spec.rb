@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe MethodObject do
 
-  let(:block) { ->{} }
+  let(:block) { lambda{} }
 
   class SimpleMethodObject < MethodObject
     def call *args, &block
