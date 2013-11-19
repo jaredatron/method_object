@@ -1,21 +1,25 @@
-# -*- encoding: utf-8 -*-
-require File.expand_path('../lib/method_object', __FILE__)
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'method_object'
 
-Gem::Specification.new do |gem|
-  gem.authors       = ["Jared Grippe"]
-  gem.email         = ["jared@deadlyicon.com"]
-  gem.description   = %q{wraps up the method object pattern into a class}
-  gem.summary       = %q{wraps up the method object pattern into a class}
-  gem.homepage      = "https://github.com/deadlyicon/method_object"
+Gem::Specification.new do |spec|
+  spec.name          = "method_object"
+  spec.version       = MethodObject::VERSION
+  spec.authors       = ["Jared Grippe"]
+  spec.email         = ["jared@deadlyicon.com"]
+  spec.description   = %q{wraps up the method object pattern into a class}
+  spec.summary       = %q{wraps up the method object pattern into a class}
+  spec.homepage      = "https://github.com/deadlyicon/method_object"
+  spec.license       = "MIT"
 
-  gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "method_object"
-  gem.require_paths = ["lib"]
-  gem.version       = MethodObject::VERSION
+  spec.files         = `git ls-files`.split($/)
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.require_paths = ["lib"]
 
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'pry-debugger'
+  spec.add_development_dependency "bundler", "~> 1.3"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'pry-debugger'
 end
