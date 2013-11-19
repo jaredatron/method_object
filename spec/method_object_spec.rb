@@ -16,7 +16,7 @@ describe MethodObject do
   shared_examples 'a method object' do
     describe '.new' do
       it 'should be private' do
-        expect(subject.private_methods).to include :new
+        expect(subject.private_methods.map(&:to_s)).to include 'new'
       end
     end
     describe '.to_proc' do
