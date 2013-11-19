@@ -23,7 +23,7 @@ describe MethodObject do
       it 'should return a proc that calls call' do
         expect(subject.to_proc).to be_a Proc
         expect(subject).to receive(:call).with(:a,:b)
-        subject.to_proc.(:a, :b)
+        subject.to_proc.call(:a, :b)
       end
     end
   end
