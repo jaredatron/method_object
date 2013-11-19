@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/deadlyicon/method_object.png?branch=master)](https://travis-ci.org/deadlyicon/method_object)
+
 # MethodObject
 
 MethodObject is a simple class for facilitating the method object pattern.
