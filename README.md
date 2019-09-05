@@ -1,3 +1,9 @@
+# `method_object` has moved!
+
+to https://github.com/bukowskis/method_object
+
+## DEPRECATED README:
+
 [![Build Status](https://travis-ci.org/deadlyicon/method_object.png?branch=master)](https://travis-ci.org/deadlyicon/method_object)
 
 # MethodObject
